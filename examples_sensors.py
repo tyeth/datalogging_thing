@@ -1,16 +1,22 @@
 """
 Example: Using different INA sensors
 This file shows how to adapt the code for various INA sensors.
-Copy the relevant section to code.py and adjust as needed.
 
-NOTE: This is a reference file with code snippets. Each example assumes
-the necessary imports are present. Add these at the top of your code.py:
+IMPORTANT: This is a REFERENCE FILE with multiple code examples.
+Each example shows a different sensor or technique. When using an example:
+1. Copy the specific example you need
+2. Add the required imports listed in comments
+3. Paste into your code.py file
 
-import time
-import board
-import busio
-import digitalio
-from adafruit_ina260 import INA260
+Common imports used throughout (add these to your code.py):
+    import time
+    import board
+    import busio
+    import digitalio
+    from adafruit_ina260 import INA260
+
+Note: Examples reuse variable names (i2c, sensor) for clarity.
+When copying to your code, ensure you have the necessary imports.
 """
 
 # ==============================================================================

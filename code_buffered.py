@@ -25,7 +25,7 @@ except ImportError:
     display_available = False
 
 # Configuration
-SAMPLE_INTERVAL = 0.001  # 1ms between samples (1kHz target)
+SAMPLE_INTERVAL = 0.001  # 1ms target (actual rate depends on I2C/sensor speed)
 BUFFER_SIZE = 100  # Number of samples to buffer before writing to SD
 LOG_FILE = "/sd/datalog.csv"
 DISPLAY_UPDATE_INTERVAL = 0.5
