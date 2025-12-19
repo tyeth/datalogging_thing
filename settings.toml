@@ -1,0 +1,19 @@
+# CircuitPython Settings
+# This file can be used for configuration values
+# Access in code with: os.getenv("SETTING_NAME")
+
+# Display settings
+DISPLAY_WIDTH = "240"
+DISPLAY_HEIGHT = "135"
+DISPLAY_ROTATION = "270"
+
+# Sampling configuration
+SAMPLE_RATE_HZ = "100"
+
+# SD Card settings
+SD_CS_PIN = "D10"
+
+# Display pins (if using breakout, not FeatherWing)
+DISPLAY_CS_PIN = "D5"
+DISPLAY_DC_PIN = "D6"
+DISPLAY_RST_PIN = "D9"
