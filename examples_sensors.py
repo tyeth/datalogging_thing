@@ -2,6 +2,15 @@
 Example: Using different INA sensors
 This file shows how to adapt the code for various INA sensors.
 Copy the relevant section to code.py and adjust as needed.
+
+NOTE: This is a reference file with code snippets. Each example assumes
+the necessary imports are present. Add these at the top of your code.py:
+
+import time
+import board
+import busio
+import digitalio
+from adafruit_ina260 import INA260
 """
 
 # ==============================================================================
@@ -10,6 +19,7 @@ Copy the relevant section to code.py and adjust as needed.
 # Built-in shunt resistor
 # ==============================================================================
 
+# Required imports: board, busio
 from adafruit_ina260 import INA260
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
@@ -30,6 +40,7 @@ power = sensor.power      # Milliwatts
 # Requires external shunt resistor
 # ==============================================================================
 
+# Required imports: board, busio
 from adafruit_ina219 import INA219
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
@@ -51,6 +62,7 @@ voltage = bus_voltage + shunt_voltage
 # Three independent channels
 # ==============================================================================
 
+# Required imports: board, busio
 from adafruit_ina3221 import INA3221
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
@@ -82,6 +94,7 @@ current_ch2 = sensor.current(2)
 # Use the alert pin to trigger sampling instead of polling
 # ==============================================================================
 
+# Required imports: board, busio, digitalio
 from adafruit_ina260 import INA260, AlertLimit
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
@@ -105,45 +118,58 @@ while True:
 
 
 # ==============================================================================
-# EXAMPLE 5: High-speed continuous mode with interrupts
-# Use CircuitPython interrupts for maximum sampling rate
+# EXAMPLE 5: High-speed continuous mode with asyncio
+# NOTE: asyncio is not available in standard CircuitPython!
+# This requires a special build or CircuitPython 8.0+ with asyncio support.
+# For most users, use timer-based approach in code_buffered.py instead.
 # ==============================================================================
 
-import asyncio
-from adafruit_ina260 import INA260
+# Required imports: time, board, busio
+# Optional (requires special build): asyncio
+try:
+    import asyncio
+    ASYNCIO_AVAILABLE = True
+except ImportError:
+    ASYNCIO_AVAILABLE = False
+    print("asyncio not available - use standard timer-based approach")
+
+from adafruit_ina260 import INA260, Mode
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
 sensor = INA260(i2c)
 sensor.averaging_count = 1
 sensor.mode = Mode.CONTINUOUS  # Continuous conversion
 
+LOG_FILE = "/sd/datalog.csv"  # Define log file path
 data_queue = []
 
-async def sample_sensor():
-    while True:
-        voltage = sensor.voltage
-        current = sensor.current
-        power = sensor.power
-        data_queue.append((time.monotonic(), voltage, current, power))
-        await asyncio.sleep(0.001)  # 1ms
+if ASYNCIO_AVAILABLE:
+    async def sample_sensor():
+        while True:
+            voltage = sensor.voltage
+            current = sensor.current
+            power = sensor.power
+            data_queue.append((time.monotonic(), voltage, current, power))
+            await asyncio.sleep(0.001)  # 1ms
 
-async def write_to_sd():
-    while True:
-        if len(data_queue) > 0:
-            # Write batch to SD
-            with open(LOG_FILE, "a") as f:
-                for timestamp, v, i, p in data_queue:
-                    f.write(f"{timestamp:.3f},{v:.3f},{i:.2f},{p:.2f}\n")
-            data_queue.clear()
-        await asyncio.sleep(1.0)  # Write every second
+    async def write_to_sd():
+        while True:
+            if len(data_queue) > 0:
+                # Write batch to SD
+                with open(LOG_FILE, "a") as f:
+                    for timestamp, v, i, p in data_queue:
+                        f.write(f"{timestamp:.3f},{v:.3f},{i:.2f},{p:.2f}\n")
+                data_queue.clear()
+            await asyncio.sleep(1.0)  # Write every second
 
-async def main():
-    await asyncio.gather(
-        sample_sensor(),
-        write_to_sd()
-    )
+    async def main():
+        await asyncio.gather(
+            sample_sensor(),
+            write_to_sd()
+        )
 
-asyncio.run(main())
+    # Only run if asyncio is available
+    asyncio.run(main())
 
 
 # ==============================================================================
@@ -152,6 +178,7 @@ asyncio.run(main())
 # Can be changed with A0/A1 solder jumpers to 0x41, 0x44, 0x45
 # ==============================================================================
 
+# Required imports: board, busio
 from adafruit_ina260 import INA260
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=400000)
